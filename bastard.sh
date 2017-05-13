@@ -6,17 +6,19 @@ if defaults read -g NSUserDictionaryReplacementItems >/dev/null 2>&1; then
 	defaults write -g NSUserDictionaryReplacementItems -array-add '{on=1;replace=the;with="teh";}'
 fi
 
-# Test for various RC files to bomb
-BASH=0
-ZSH=0
+add_alias() {
+	add_to_rc 'alias '$1'="'$2';'$1'"'
+}
 
-if [ -f "$HOME/.bashrc" ]; then
-	BASH=1
-fi
-
-if [ -f "$HOME/.zshrc" ]; then
-	ZSH=1
-fi
+# Add things to the end of an RC file
+add_to_rc() {
+	if [ -f "$HOME/.bashrc" ]; then
+		echo $* >> "$HOME/.bashrc"
+	fi
+	if [ -f "$HOME/.zshrc" ]; then
+		echo $* >> "$HOME/.zshrc"
+	fi
+}
 
 # Does homebrew exist?
 
@@ -38,7 +40,12 @@ if command -v brew >/dev/null 2>&1; then
 
 	# Alias these tools :-)
 	if command -v figlet >/dev/null 2>&1; then
-		echo 'alias cd="figlet CHANGING DIRECTORY; cd"'
+		add_alias cd "figlet CHANGING DIRECTORY"
+		add_alias ls "figlet LISTING FILES"
+		add_alias rm "figlet REMOVING FILES"
+	fi
+	if command -v cowsay >/dev/null 2>&1; then
+		add_to_rc 'cowsay Welcome $USER'
 	fi
 fi
 
